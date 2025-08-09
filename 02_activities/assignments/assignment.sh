@@ -28,36 +28,31 @@ unzip -q rawdata.zip
 # Complete assignment here
 
 # 1. Create a directory named data
-<<<<<<< HEAD
-mkdird data
+mkdir -p data
+
 # 2. Move the ./rawdata directory to ./data/raw
-move ./rawdata .data/raw
-=======
-mkdir data
-# 2. Move the ./rawdata directory to ./data/raw
-mkdir data/raw
-cd ../ 
-mv rawdata.zip data/raw/rawdata.zip
->>>>>>> 1401976 (finished assignments)
+# (After unzip, there is a directory named rawdata next to this script)
+mkdir -p data/raw
+mv -f rawdata data/raw/
+
 # 3. List the contents of the ./data/raw directory
-cd data/raw/
-ls
-# 4. In ./data/processed, create the following directories: server_logs, user_logs, and event_logs
-mkdir processed/server_logs
-mkdir processed/user_logs
-mkdir processed/event_logs
-# 5. Copy all server log files (files with "server" in the name AND a .log extension) from ./data/raw to ./data/processed/server_logs
- cp raw/*server*.log processed/server_logs/
-# 6. Repeat the above step for user logs and event logs
-cp raw/*user*.log processed/user_logs/
-cp raw/*event*.log processed/event_logs/
+ls data/raw/
 
-# 7. For user privacy, remove all files containing IP addresses (files with "ipaddr" in the filename) from ./data/raw and ./data/processed/user_logs
-rm -f raw/*ipaddr* processed/user_logs/*ipaddr*
+# 4. In ./data/processed, create the following directories
+mkdir -p data/processed/{server_logs,user_logs,event_logs}
 
-# 8. Create a file named ./data/inventory.txt that lists all the files in the subfolders of ./data/processed
-find processed -type f > inventory.txt
+# 5–6. Copy matching logs from ./data/raw (including subfolders) to processed subfolders
+# Use find so it works whether logs are in data/raw/ or data/raw/rawdata/
+find data/raw -type f -name "*server*.log" -exec cp -f {} data/processed/server_logs/ \;
+find data/raw -type f -name "*user*.log"   -exec cp -f {} data/processed/user_logs/ \;
+find data/raw -type f -name "*event*.log"  -exec cp -f {} data/processed/event_logs/ \;
 
+# 7. Remove files containing "ipaddr" from ./data/raw and ./data/processed/user_logs
+rm -f data/raw/*ipaddr* data/processed/user_logs/*ipaddr* 2>/dev/null || true
+
+# 8. Create ./data/inventory.txt listing all files in subfolders of ./data/processed
+find data/processed -type f | sort > data/inventory.txt
 ###########################################
+
 
 echo "Project setup is complete!"
