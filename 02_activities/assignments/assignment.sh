@@ -18,6 +18,7 @@ cd newproject
 
 mkdir analysis output
 touch README.md
+echo "# Project Name: DSI Consulting Inc." > README.md
 touch analysis/main.py
 
 # download client data
@@ -33,19 +34,28 @@ mkdir -p data
 # 2. Move the ./rawdata directory to ./data/raw
 # (After unzip, there is a directory named rawdata next to this script)
 mkdir -p data/raw
-mv -f rawdata data/raw/
+mv -f rawdata/* data/raw/ 2>/dev/null || true
+rmdir rawdata 2>/dev/null || true
 
 # 3. List the contents of the ./data/raw directory
 ls data/raw/
 
-# 4. In ./data/processed, create the following directories
+# 4. In ./data/processed, create the following directories: server_logs, user_logs, and event_logs
 mkdir -p data/processed/{server_logs,user_logs,event_logs}
+# 5. Copy all server log files (files with "server" in the name AND a .log extension) from ./data/raw to ./data/processed/server_logs
+
+# 6. Repeat the above step for user logs and event logs
+
+# 7. For user privacy, remove all files containing IP addresses (files with "ipaddr" in the filename) from ./data/raw and ./data/processed/user_logs
+rf -rf ./data
+
+# 8. Create a file named ./data/inventory.txt that lists all the files in the subfolders of ./data/processed
 
 # 5–6. Copy matching logs from ./data/raw (including subfolders) to processed subfolders
 # Use find so it works whether logs are in data/raw/ or data/raw/rawdata/
-find data/raw -type f -name "*server*.log" -exec cp -f {} data/processed/server_logs/ \;
-find data/raw -type f -name "*user*.log"   -exec cp -f {} data/processed/user_logs/ \;
-find data/raw -type f -name "*event*.log"  -exec cp -f {} data/processed/event_logs/ \;
+cp -f data/raw/*server*.log data/processed/server_logs/ 2>/dev/null || true
+cp -f data/raw/*user*.log   data/processed/user_logs/   2>/dev/null || true
+cp -f data/raw/*event*.log  data/processed/event_logs/  2>/dev/null || true
 
 # 7. Remove files containing "ipaddr" from ./data/raw and ./data/processed/user_logs
 rm -f data/raw/*ipaddr* data/processed/user_logs/*ipaddr* 2>/dev/null || true
